@@ -2,6 +2,11 @@
 
 An unofficial fork of [faush01/playback_reporting](https://github.com/faush01/playback_reporting), an Emby Server plugin for collecting and displaying playback statistics.
 
+## Added in 2.1.0.9
+
+- **Exclude Live TV** checkbox, independent of audio and library exclusions. Off by default.
+- Detects live programs and TV channels; recordings remain controlled by library exclusions.
+
 ## Added in 2.1.0.8
 
 - **Exclude audio playback** checkbox.

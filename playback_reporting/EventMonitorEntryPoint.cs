@@ -140,6 +140,15 @@ namespace playback_reporting
         private bool IsExcluded(SessionInfo session)
         {
             var options = _config.GetReportPlaybackOptions();
+            // Emby marks live programs with IsLive and channels with TvChannel.
+            // Do not use ChannelId: recordings can retain their original channel.
+            if (options.ExcludeLiveTv &&
+                (session.NowPlayingItem.IsLive == true ||
+                 string.Equals(session.NowPlayingItem.Type, "TvChannel", StringComparison.OrdinalIgnoreCase)))
+            {
+                return true;
+            }
+
             if (options.ExcludeAudio &&
                 (string.Equals(session.NowPlayingItem.MediaType, "Audio", StringComparison.OrdinalIgnoreCase) ||
                  string.Equals(session.NowPlayingItem.Type, "Audio", StringComparison.OrdinalIgnoreCase)))

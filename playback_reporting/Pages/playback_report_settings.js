@@ -87,6 +87,7 @@ define(['mainTabsManager', Dashboard.getConfigurationResourceUrl('helper_functio
     }
 
     function loadExclusions(view, config) {
+        view.querySelector('#exclude_live_tv').checked = !!config.ExcludeLiveTv;
         view.querySelector('#exclude_audio').checked = !!config.ExcludeAudio;
         var container = view.querySelector('#excluded_libraries');
         var save = view.querySelector('#save_exclusions');
@@ -663,11 +664,13 @@ define(['mainTabsManager', Dashboard.getConfigurationResourceUrl('helper_functio
             var selected = Array.prototype.filter.call(container.querySelectorAll('input'), function (input) {
                 return input.checked;
             }).map(function (input) { return input.value; });
+            var excludeLiveTv = view.querySelector('#exclude_live_tv').checked;
             var excludeAudio = view.querySelector('#exclude_audio').checked;
             ApiClient.getNamedConfiguration('playback_reporting').then(function (config) {
                 var unavailable = (config.ExcludedLibraryIds || []).filter(function (id) {
                     return container.availableIds.indexOf(String(id)) === -1;
                 });
+                config.ExcludeLiveTv = excludeLiveTv;
                 config.ExcludeAudio = excludeAudio;
                 config.ExcludedLibraryIds = unavailable.concat(selected);
                 return ApiClient.updateNamedConfiguration('playback_reporting', config);
