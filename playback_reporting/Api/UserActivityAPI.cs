@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright(C) 2018
 
 This program is free software: you can redistribute it and/or modify
@@ -38,6 +38,12 @@ using MediaBrowser.Model.Querying;
 
 namespace playback_reporting.Api
 {
+    [Route("/user_usage_stats/library_list", "GET", Summary = "Gets libraries available for playback exclusions")]
+    [Authenticated(Roles = "admin")]
+    public class GetLibraryList : IReturn<Object>
+    {
+    }
+
     // http://localhost:8096/emby/user_usage_stats/session_list
     [Route("/user_usage_stats/session_list", "GET", Summary = "Gets Session Info")]
     [Authenticated(Roles = "admin")]
@@ -277,6 +283,15 @@ namespace playback_reporting.Api
         }
 
         public IRequest Request { get; set; }
+
+        public object Get(GetLibraryList request)
+        {
+            return _libraryManager.GetVirtualFolders().Select(folder => new
+            {
+                Id = folder.ItemId,
+                Name = folder.Name
+            }).ToArray();
+        }
 
         public object Get(GetItemPath request)
         {
@@ -1192,3 +1207,4 @@ namespace playback_reporting.Api
 
     }
 }
+

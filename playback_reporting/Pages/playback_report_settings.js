@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright(C) 2018
 
 This program is free software: you can redistribute it and/or modify
@@ -86,7 +86,39 @@ define(['mainTabsManager', Dashboard.getConfigurationResourceUrl('helper_functio
         });
     }
 
+    function loadExclusions(view, config) {
+        view.querySelector('#exclude_audio').checked = !!config.ExcludeAudio;
+        var container = view.querySelector('#excluded_libraries');
+        var save = view.querySelector('#save_exclusions');
+        save.disabled = true;
+        var excluded = config.ExcludedLibraryIds || [];
+        ApiClient.getUserActivity(ApiClient.getUrl('user_usage_stats/library_list')).then(function (libraries) {
+            container.textContent = '';
+            libraries.forEach(function (library) {
+                var label = document.createElement('label');
+                label.style.display = 'block';
+                var checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.value = String(library.Id);
+                checkbox.checked = excluded.indexOf(String(library.Id)) !== -1;
+                label.appendChild(checkbox);
+                label.appendChild(document.createTextNode(' ' + library.Name));
+                container.appendChild(label);
+            });
+            if (!libraries.length) {
+                container.textContent = 'No libraries found.';
+            }
+            // Retain exclusions for unavailable libraries until they reappear.
+            container.availableIds = libraries.map(function (library) { return String(library.Id); });
+            save.disabled = false;
+        }).catch(function () {
+            container.textContent = 'Unable to load libraries. Reopen this page to retry.';
+        });
+    }
+
     function loadPage(view, config) {
+        loadExclusions(view, config);
+
 
         console.log("Settings Page Loaded With Config : " + JSON.stringify(config));
         var max_data_age_select = view.querySelector('#max_data_age_select');
@@ -622,6 +654,32 @@ define(['mainTabsManager', Dashboard.getConfigurationResourceUrl('helper_functio
 
         });
 
+        view.querySelector('#save_exclusions').addEventListener('click', function () {
+            var button = view.querySelector('#save_exclusions');
+            var container = view.querySelector('#excluded_libraries');
+            var status = view.querySelector('#exclusions_status');
+            button.disabled = true;
+            status.textContent = 'Saving...';
+            var selected = Array.prototype.filter.call(container.querySelectorAll('input'), function (input) {
+                return input.checked;
+            }).map(function (input) { return input.value; });
+            var excludeAudio = view.querySelector('#exclude_audio').checked;
+            ApiClient.getNamedConfiguration('playback_reporting').then(function (config) {
+                var unavailable = (config.ExcludedLibraryIds || []).filter(function (id) {
+                    return container.availableIds.indexOf(String(id)) === -1;
+                });
+                config.ExcludeAudio = excludeAudio;
+                config.ExcludedLibraryIds = unavailable.concat(selected);
+                return ApiClient.updateNamedConfiguration('playback_reporting', config);
+            }).then(function () {
+                status.textContent = 'Saved.';
+                button.disabled = false;
+            }).catch(function () {
+                status.textContent = 'Unable to save. Please try again.';
+                button.disabled = false;
+            });
+        });
+
         view.addEventListener('viewhide', function (e) {
 
         });
@@ -631,4 +689,5 @@ define(['mainTabsManager', Dashboard.getConfigurationResourceUrl('helper_functio
         });
     };
 });
+
 

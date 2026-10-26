@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;</TargetFrameworks>
-    <AssemblyVersion>2.1.0.7</AssemblyVersion>
-    <FileVersion>2.1.0.7</FileVersion>
-    <Version>2.1.0.7</Version>
+    <AssemblyVersion>2.1.0.8</AssemblyVersion>
+    <FileVersion>2.1.0.8</FileVersion>
+    <Version>2.1.0.8</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="Pages\activity_report.html" />
@@ -57,7 +57,8 @@
     <PackageReference Include="SQLitePCL.pretty.core" Version="1.2.2" />
     <PackageReference Include="System.Memory" Version="4.5.5" />
   </ItemGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(InstallToEmby)' == 'true'">
     <Exec Command="xcopy &quot;$(TargetPath)&quot; &quot;%AppData%\Emby-Server\programdata\plugins\&quot; /y" />
   </Target>
 </Project>
+

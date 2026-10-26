@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright(C) 2018
 
 This program is free software: you can redistribute it and/or modify
@@ -30,6 +30,8 @@ namespace playback_reporting
         public List<PlaylistDetails> ActivityPlaylists { set; get; } = new List<PlaylistDetails>();
         public HashSet<string> ColourPalette { set; get; } = new HashSet<string>();
         public List<CustomQueryDetails> CustomQueries { set; get; } = new List<CustomQueryDetails>();
+        public bool ExcludeAudio { set; get; } = false;
+        public string[] ExcludedLibraryIds { set; get; } = new string[0];
         public int IgnoreSmallerThan { set; get; } = 0;
     }
 
@@ -52,3 +54,4 @@ namespace playback_reporting
         public string ChartDataCloumn { set; get; }
     }
 }
+

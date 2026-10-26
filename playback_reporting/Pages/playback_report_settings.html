@@ -1,10 +1,20 @@
-﻿<div data-role="page" class="page type-interior pluginConfigurationPage withTabs"
+<div data-role="page" class="page type-interior pluginConfigurationPage withTabs"
 	 data-require="emby-button,emby-select,emby-checkbox,emby-linkbutton"
 	 data-controller="__plugin/playback_report_settings.js">
 	<div data-role="content">
 		<div class="content-primary" style="padding-top:2px;">
 			<h2 style="margin-top: 0px;margin-bottom: 0px;">Playback Report Settings</h2>
 
+            <fieldset>
+                <legend style="font-weight:bold;font-size:large;">Playback exclusions</legend>
+                <p><label><input type="checkbox" id="exclude_audio" /> Exclude audio playback</label></p>
+                <p>Select libraries to exclude from playback logging:</p>
+                <div id="excluded_libraries" aria-label="Excluded libraries">Loading libraries...</div>
+                <p><button type="button" id="save_exclusions" disabled>Save exclusions</button>
+                <span id="exclusions_status" role="status" aria-live="polite"></span></p>
+                <p>Changes apply to new playback activity. Existing history is retained.</p>
+            </fieldset>
+            <br />
 			<fieldset>
 				<legend style="font-weight:bold;font-size:large;">Activity playlists</legend>
 				<p>

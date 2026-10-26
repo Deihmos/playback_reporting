@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright(C) 2018
 
 This program is free software: you can redistribute it and/or modify
@@ -137,6 +137,33 @@ namespace playback_reporting
             }
         }
 
+        private bool IsExcluded(SessionInfo session)
+        {
+            var options = _config.GetReportPlaybackOptions();
+            if (options.ExcludeAudio &&
+                (string.Equals(session.NowPlayingItem.MediaType, "Audio", StringComparison.OrdinalIgnoreCase) ||
+                 string.Equals(session.NowPlayingItem.Type, "Audio", StringComparison.OrdinalIgnoreCase)))
+            {
+                return true;
+            }
+
+            var excluded = options.ExcludedLibraryIds;
+            if (excluded == null || excluded.Length == 0)
+            {
+                return false;
+            }
+
+            var item = _libraryManager.GetItemById(session.NowPlayingItem.Id);
+            if (item == null)
+            {
+                return false;
+            }
+
+            return _libraryManager.GetCollectionFolders(item).Any(folder =>
+                excluded.Contains(folder.InternalId.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                                  StringComparer.OrdinalIgnoreCase));
+        }
+
         private void ProcessSessions()
         {
             List<PlaybackInfo> active_playinfo_list = new List<PlaybackInfo>();
@@ -146,6 +173,11 @@ namespace playback_reporting
                 if (session.NowPlayingItem == null)
                 {
                     // nothing playing so move on to next
+                    continue;
+                }
+
+                if (IsExcluded(session))
+                {
                     continue;
                 }
 
@@ -350,3 +382,4 @@ namespace playback_reporting
         }
     }
 }
+
